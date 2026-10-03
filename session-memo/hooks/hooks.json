@@ -1,0 +1,4 @@
+{
+  "description": "session-memo の hooks モジュール",
+  "modules": ["./register.tsx"]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "session-memo",
+  "version": "0.1.0",
+  "description": "セッションごとのメモ帳。/memo でペインを開き、Claude に送らずにメモを書ける",
+  "author": { "name": "Sora Akagami" },
+  "license": "MIT"
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-mods",
+  "description": "Claude Code の mod 置き場",
+  "owner": { "name": "Sora Akagami" },
+  "plugins": [
+    {
+      "name": "session-memo",
+      "description": "セッションごとのメモ帳。/memo でペインを開き、Claude に送らずにメモを書ける",
+      "source": "./session-memo"
+    }
+  ]
+}
