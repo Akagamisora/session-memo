@@ -1,13 +1,16 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "claude-mods",
-  "description": "Claude Code の mod 置き場",
+  "name": "session-memo",
+  "description": "session-memo: Claude Code のセッションごとのメモ帳",
   "owner": { "name": "Sora Akagami" },
   "plugins": [
     {
       "name": "session-memo",
       "description": "セッションごとのメモ帳。/memo でペインを開き、Claude に送らずにメモを書ける",
-      "source": "./session-memo"
+      "source": "./",
+      "homepage": "https://github.com/Akagamisora/session-memo",
+      "repository": "https://github.com/Akagamisora/session-memo",
+      "license": "MIT"
     }
   ]
 }
