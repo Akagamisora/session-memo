@@ -43,3 +43,47 @@ test('ペインの入力欄から足して、x で消せる', async ($, on) => {
     await ui.unmount()
   }
 })
+
+test('「送る」でメモを Claude に送り、送ったメモは消える', async ($, on) => {
+  mock.store(on)
+  on('session.id', () => ({ value: 'test-session' }))
+  mock.clock(on)
+  const sent: string[] = []
+  on('prompt.submit', (_, e) => {
+    sent.push(e.text)
+    return { text: e.text }
+  })
+
+  const ui = await $.ui.mount({
+    plugin: 'session-memo',
+    surface: 'terminal',
+    component: 'Pane',
+    requestId: 'memo',
+    props: { title: 'メモ', isFocused: true, bodyColumns: 60, placement: 'dock' },
+  })
+  await ui.input({ key: 'new', text: 'テストも足して' })
+  await ui.input({ key: 'new', text: 'README を直して' })
+  await ui.press({ key: 'send-0' })
+
+  expect(sent).toEqual(['テストも足して'])
+  expect(await ui.find({ type: 'Text', text: /テストも足して/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /README を直して/ })).toBeDefined()
+  await ui.unmount()
+})
+
+test('件数をステータス行に出し、0 件になったら消す', async ($, on) => {
+  mock.store(on)
+  on('session.id', () => ({ value: 'test-session' }))
+  mock.clock(on)
+  const shown: (string | undefined)[] = []
+  on('ui.status', (_, e) => {
+    shown.push(e.text)
+    return {}
+  })
+
+  await $.command.run({ command: 'memo', args: '一つめ' })
+  await $.command.run({ command: 'memo', args: '二つめ' })
+  await $.command.run({ command: 'memo', args: 'clear' })
+
+  expect(shown.slice(-3)).toEqual(['メモ 1 件', 'メモ 2 件', undefined])
+})
