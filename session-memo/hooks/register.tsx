@@ -7,6 +7,8 @@ const PANE = 'memo'
 // 今のセッションのメモ。リロードで消えるので、正は $.store 側に置く
 let notes: Note[] = []
 let loadedFor: string | undefined
+// Claude に送って、ターンが始まるのを待っているメモ
+let sending: Note[] = []
 
 const pad = (n: number) => String(n).padStart(2, '0')
 const hhmm = (ms: number) => {
@@ -25,12 +27,19 @@ async function load($: EngineInterface): Promise<string> {
   const saved = await $.store.get('notes:' + id)
   notes = Array.isArray(saved) ? (saved as Note[]) : []
   loadedFor = id
+  showCount($)
   return id
+}
+
+// ペインを閉じていても件数が分かるよう、プロンプト下のステータス行に出す
+function showCount($: EngineInterface): void {
+  $.ui.status(notes.length > 0 ? 'メモ ' + notes.length + ' 件' : undefined)
 }
 
 async function persist($: EngineInterface, id: string): Promise<void> {
   if (notes.length === 0) await $.store.delete('notes:' + id)
   else await $.store.set('notes:' + id, notes)
+  showCount($)
   $.ui.invalidate('ui.render')
 }
 
@@ -43,6 +52,24 @@ async function add($: EngineInterface, text: string): Promise<void> {
 async function removeAt($: EngineInterface, index: number): Promise<void> {
   const id = await load($)
   notes = notes.filter((_, i) => i !== index)
+  await persist($, id)
+}
+
+// メモを本人の言葉として Claude に送る。submit はセッションが空くまで待ってから
+// ターンを始めるので、メモを消すのはターンが始まったあと。送れなければ残す
+async function send($: EngineInterface, note: Note): Promise<void> {
+  if (sending.includes(note)) return
+  sending = [...sending, note]
+  $.ui.invalidate('ui.render')
+  const sent = await $.prompt.submit({ text: note.text, asUser: true })
+  sending = sending.filter(one => one !== note)
+  if (sent.drop !== undefined) {
+    $.ui.toast('メモを送れませんでした: ' + sent.drop)
+    $.ui.invalidate('ui.render')
+    return
+  }
+  const id = await load($)
+  notes = notes.filter(one => one !== note)
   await persist($, id)
 }
 
@@ -136,6 +163,19 @@ export const register: Register = on => {
         {notes.map((note, i) => (
           <Box flexDirection="row" columnGap={1}>
             <Button key={'delete-' + i} label="x" plain onPress={() => removeAt($, i)} />
+            {sending.includes(note) ? (
+              <Text dimColor>送信待ち</Text>
+            ) : (
+              <Button
+                key={'send-' + i}
+                label="送る"
+                plain
+                onPress={() => {
+                  // ターンが始まるまで終わらないので、ハンドラでは待たない
+                  void send($, note)
+                }}
+              />
+            )}
             <Text dimColor>{hhmm(note.at)}</Text>
             <Text>{note.text}</Text>
           </Box>
