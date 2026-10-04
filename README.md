@@ -1,32 +1,28 @@
-# claude-mods
+# session-memo
 
-Claude Code の mod 置き場。リポジトリ自体がマーケットプレイスになっていて、mod ごとにフォルダを分けている。
-
-| mod | 何をするか |
-| :- | :- |
-| [session-memo](session-memo/) | セッションごとのメモ帳。Claude に送らずにメモを書ける |
+Claude Code の mod。今のセッションに紐づくメモ帳をペインに出す。メモを書いてもターンは始まらず、Claude には送られない。Claude の作業中でも書ける。
 
 mod は Claude Code v2.1.287 以降で動く。動作確認は v2.1.288(macOS、Ghostty)。
 
 ## 入れ方
 
+このリポジトリ自体がマーケットプレイスになっている。
+
 ```bash
-claude plugin marketplace add Akagamisora/claude-mods
-claude plugin install session-memo@claude-mods
+claude plugin marketplace add Akagamisora/session-memo
+claude plugin install session-memo@session-memo
 ```
 
 入れずに 1 セッションだけ試すなら、clone して `--plugin-dir` で読み込む。
 
 ```bash
-git clone https://github.com/Akagamisora/claude-mods
-claude --plugin-dir claude-mods/session-memo
+git clone https://github.com/Akagamisora/session-memo
+claude --plugin-dir session-memo
 ```
 
-mod は本人の権限で動く。入れる前に `claude plugin validate claude-mods/session-memo` で、どのイベントに割り込み、どの API を呼ぶかを確認できる。
+mod は本人の権限で動く。入れる前に `claude plugin validate session-memo` で、どのイベントに割り込み、どの API を呼ぶかを確認できる。
 
-## session-memo
-
-今のセッションに紐づくメモ帳。メモを書いてもターンは始まらず、Claude には送られない。Claude の作業中でも書ける。
+## 使い方
 
 | 操作 | 動き |
 | :- | :- |
@@ -44,7 +40,7 @@ mod は本人の権限で動く。入れる前に `claude plugin validate claude
 
 メモはセッション ID ごとにプラグインのストア(`~/.claude/plugins/store/` 配下)へ保存するので、`/resume` で再開しても残る。別のセッションには出てこない。
 
-### この mod が触る範囲
+## この mod が触る範囲
 
 - 読む: 環境変数 `HOME`、セッション ID、作業フォルダのパス
 - 書く: プラグインのストア、`~/claude-memos/<日付>-<セッション ID の先頭 8 文字>.md`(保存を押したときだけ)
@@ -54,12 +50,12 @@ mod は本人の権限で動く。入れる前に `claude plugin validate claude
 ## 開発
 
 ```bash
-claude --plugin-dir session-memo     # 読み込んで起動。ファイルを保存すると再読み込みされる
-claude plugin validate session-memo  # フックと API 呼び出しの一覧
-claude plugin test session-memo      # テスト
+claude --plugin-dir .     # 読み込んで起動。ファイルを保存すると再読み込みされる
+claude plugin validate .  # フックと API 呼び出しの一覧
+claude plugin test .      # テスト
 ```
 
-mod を変えたら、同じ変更の中で `plugin.json` の `version` と `CHANGELOG.md` を更新する。インストール済みのコピーはバージョン単位で保存されるので、バージョンを上げないと更新が届かない。
+mod を変えたら、同じ変更の中で `.claude-plugin/plugin.json` の `version` と `CHANGELOG.md` を更新する。インストール済みのコピーはバージョン単位で保存されるので、バージョンを上げないと更新が届かない。
 
 ## ライセンス
 

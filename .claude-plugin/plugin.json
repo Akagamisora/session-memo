@@ -3,5 +3,8 @@
   "version": "0.2.0",
   "description": "セッションごとのメモ帳。/memo でペインを開き、Claude に送らずにメモを書ける",
   "author": { "name": "Sora Akagami" },
-  "license": "MIT"
+  "homepage": "https://github.com/Akagamisora/session-memo",
+  "repository": "https://github.com/Akagamisora/session-memo",
+  "license": "MIT",
+  "keywords": ["memo", "notes", "pane", "mod"]
 }

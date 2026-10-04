@@ -3,4 +3,4 @@
 
 # Claude Code が mod を読み込むたびに書き出す型定義と、それを参照する tsconfig
 .claude-plugin/types/
-/*/tsconfig.json
+/tsconfig.json
